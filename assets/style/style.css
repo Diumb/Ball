@@ -5,3 +5,7 @@
     width: 100%;
     background: #404040;
 }
+
+.ball__canvas {
+    display: block;
+}
