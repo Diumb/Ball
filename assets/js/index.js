@@ -1,3 +1,8 @@
+// Imports
+
+import { checkMethods } from "./checkMethods.js";
+import { animationMethods } from "./animationMethods.js";
+
 // Canvas Variables
 
 const canvas = document.querySelector(".ball__canvas"),
@@ -19,6 +24,22 @@ let ballSettings = {
     direction: "top",
 }
 
+// Keys List
+
+let keyList = [
+
+    {
+        key: "Enter",
+        func: () => animationMethods.startAnimation(animationSettings, ballAnimation),
+    },
+
+    {
+        key: "Backspace",
+        func: () => animationMethods.stopAnimation(animationSettings),
+    },
+
+];
+
 // Window Size Variables
 
 const windowHeight = document.documentElement.offsetHeight,
@@ -34,31 +55,9 @@ ctx.strokeStyle = "white";
 
 // Functions
 
-function checkDirections(settings, speed) {
-
-    switch (settings.direction) {
-        case ("right"):
-            drawBall(settings.x += ballSettings.speed * speed, settings.y);
-            break;
-        
-        case ("left"):
-            drawBall(settings.x -= ballSettings.speed * speed, settings.y);
-            break;
-        
-        case ("top"):
-            drawBall(settings.x, settings.y -= ballSettings.speed * speed);
-            break;
-        
-        case ("bottom"):
-            drawBall(settings.x, settings.y += ballSettings.speed * speed);
-            break;
-    }
-
-}
-
 function drawBall(x, y) {
 
-    checkRebound(ballSettings);
+    checkMethods.checkRebound(ballSettings, windowWidth, windowHeight);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
@@ -68,36 +67,21 @@ function drawBall(x, y) {
 
 }
 
-function checkRebound(settings) {
-
-    if (settings.x + settings.size >= windowWidth) {
-        settings.direction = "left";
-    } else if (settings.x <= 0) {
-        settings.direction = "right";
-    } else if (settings.y <= 0) {
-        settings.direction = "bottom";
-    } else if (settings.y + settings.size >= windowHeight) {
-        settings.direction = "top";
-    }
-
-}
-
 function ballAnimation(currentTime) {
+
     animationSettings.deltaTime = currentTime - animationSettings.lastUpdate;
     animationSettings.lastUpdate = currentTime;
 
-    checkDirections(ballSettings, animationSettings.deltaTime / 1000);
+    checkMethods.checkDirections(ballSettings, animationSettings.deltaTime / 1000, drawBall);
 
     if (animationSettings.isAnimation) {
         requestAnimationFrame(ballAnimation);
     }
+
 }
 
 // Event Listeners
 
 document.addEventListener("keydown", event => {
-    if (event.code == "Enter") {
-        requestAnimationFrame(ballAnimation);
-    }
+    checkMethods.checkKeys(event.code, keyList);
 });
-
